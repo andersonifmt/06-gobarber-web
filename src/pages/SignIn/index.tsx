@@ -3,7 +3,8 @@ import {FiLogIn, FiMail, FiLock} from 'react-icons/fi';
 import {FormHandles} from '@unform/core';
 import {Form} from '@unform/web';
 import * as Yup from 'yup';
-import AuthContext from '../../context/AuthContext';
+
+import { AuthContext } from '../../context/AuthContext';
 
 import logoImg from '../../../src/assets/logo.svg';
 
@@ -14,14 +15,16 @@ import Button from '../../components/Button';
 
 import {Container, Content, Background} from './styles';
 
-const Signin: React.FC = () =>{
+interface SignInFormData{
+  email: string;
+  password: string;
+}
+
+const SignIn: React.FC = () =>{
   const formRef = useRef<FormHandles>(null);
+  const { signIn } = useContext(AuthContext);
 
-  const {name} = useContext(AuthContext);
-
-  console.log(name);
-
-  const handleSubmit=useCallback(async (data: object) => {
+  const handleSubmit=useCallback(async (data: SignInFormData) => {
     try {
       formRef.current?.setErrors({});
 
@@ -33,13 +36,18 @@ const Signin: React.FC = () =>{
       await schema.validate(data, {
         abortEarly: false,
       });
+
+      signIn({
+        email: data.email,
+        password: data.password,
+      });
     } catch (err) {
 
       const erros = getValidationErros(err);
 
       formRef.current?.setErrors(erros);
     }
-  },[]);
+  },[signIn]);
 
   return (
     <Container>
@@ -67,4 +75,4 @@ const Signin: React.FC = () =>{
     );
   }
 
-export default Signin;
+export default SignIn;
